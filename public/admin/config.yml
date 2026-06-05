@@ -1,0 +1,160 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Decap CMS Configuration
+# Docs: https://decapcms.org/docs/configuration-options/
+#
+# HOW IT WORKS:
+#   1. Admin edits content at yourdomain.com/admin
+#   2. Decap CMS commits changes to your GitHub repo via GitHub API
+#   3. Vercel detects the new commit and auto-deploys
+# ─────────────────────────────────────────────────────────────────────────────
+
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/YOUR_REPO_NAME   # ← Change this!
+  branch: main
+  base_url: https://sveltia-cms-auth.YOUR_WORKER.workers.dev  # optional OAuth proxy
+
+# Allow editorial workflow (draft → review → published)
+publish_mode: editorial_workflow
+
+# Where uploaded media is stored
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# ─── COLLECTIONS ─────────────────────────────────────────────────────────────
+
+collections:
+
+  # ─── PROJECTS ──────────────────────────────────────────────────────────────
+  - name: "projects"
+    label: "Projects"
+    label_singular: "Project"
+    folder: "content/projects"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}} — {{category}}"
+    fields:
+      - { label: "Title",       name: "title",       widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - label: "Cover Image"
+        name: "image"
+        widget: "image"
+        required: false
+        media_library:
+          config:
+            multiple: false
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["Web Development", "AI/ML", "Mobile", "DevOps", "Open Source", "Other"]
+      - label: "Tech Stack"
+        name: "techStack"
+        widget: "list"
+        field: { label: "Technology", name: "tech", widget: "string" }
+      - { label: "GitHub URL",   name: "github",   widget: "string",   required: false }
+      - { label: "Live Demo URL",name: "demo",     widget: "string",   required: false }
+      - { label: "Featured",     name: "featured", widget: "boolean",  default: false }
+      - { label: "Date",         name: "date",     widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Content (Markdown)", name: "body", widget: "markdown" }
+
+  # ─── BLOG POSTS ────────────────────────────────────────────────────────────
+  - name: "blogs"
+    label: "Blog Posts"
+    label_singular: "Blog Post"
+    folder: "content/blogs"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}} — {{date}}"
+    fields:
+      - { label: "Title",   name: "title",   widget: "string" }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - label: "Cover Image"
+        name: "coverImage"
+        widget: "image"
+        required: false
+      - { label: "Date",      name: "date",     widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Read Time", name: "readTime", widget: "string",   required: false, hint: "e.g. 5 min read" }
+      - { label: "Author",    name: "author",   widget: "string",   required: false }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        field: { label: "Tag", name: "tag", widget: "string" }
+      - { label: "Content (Markdown)", name: "body", widget: "markdown" }
+
+  # ─── SKILLS ────────────────────────────────────────────────────────────────
+  - name: "skills"
+    label: "Skills"
+    label_singular: "Skill Category"
+    folder: "content/skills"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: category
+    fields:
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["Programming", "Web Development", "AI/ML", "Databases", "Tools", "Other"]
+      - label: "Skills"
+        name: "skills"
+        widget: "list"
+        fields:
+          - { label: "Skill Name", name: "name",  widget: "string" }
+          - label: "Level (0-100)"
+            name: "level"
+            widget: "number"
+            min: 0
+            max: 100
+            step: 5
+
+  # ─── CERTIFICATES ──────────────────────────────────────────────────────────
+  - name: "certificates"
+    label: "Certificates"
+    label_singular: "Certificate"
+    folder: "content/certificates"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: title
+    summary: "{{title}} — {{issuer}}"
+    fields:
+      - { label: "Title",        name: "title",  widget: "string" }
+      - { label: "Issuer",       name: "issuer", widget: "string" }
+      - { label: "Date Earned",  name: "date",   widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "Certificate Image"
+        name: "image"
+        widget: "image"
+        required: false
+      - { label: "Verification Link", name: "link", widget: "string", required: false }
+
+  # ─── ABOUT (single file) ───────────────────────────────────────────────────
+  - name: "about"
+    label: "About Me"
+    files:
+      - label: "About Page"
+        name: "about"
+        file: "content/about.md"
+        fields:
+          - { label: "Name",          name: "name",     widget: "string" }
+          - { label: "Tagline",       name: "tagline",  widget: "string" }
+          - { label: "Profile Photo", name: "photo",    widget: "image", required: false }
+          - { label: "Bio",           name: "bio",      widget: "markdown" }
+          - { label: "Location",      name: "location", widget: "string" }
+          - { label: "Email",         name: "email",    widget: "string" }
+          - { label: "GitHub URL",    name: "github",   widget: "string", required: false }
+          - { label: "LinkedIn URL",  name: "linkedin", widget: "string", required: false }
+          - { label: "Twitter URL",   name: "twitter",  widget: "string", required: false }
+          - { label: "Resume PDF",    name: "resume",   widget: "file",   required: false }
+
+  # ─── SITE SETTINGS ─────────────────────────────────────────────────────────
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - label: "General"
+        name: "general"
+        file: "content/settings.md"
+        fields:
+          - { label: "Site Name",        name: "siteName",    widget: "string" }
+          - { label: "Site Description", name: "description", widget: "text" }
+          - { label: "Site URL",         name: "url",         widget: "string" }
+          - { label: "OG Image",         name: "ogImage",     widget: "image", required: false }
